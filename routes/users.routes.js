@@ -93,8 +93,8 @@ router.get("/profile", isAuth, attachCurrentUser, async (req, res) => {
         if (loggedUser) {
             const populateUser = await userModel
                 .findById(loggedUser._id)
+                .populate("favorite");
             //populate user with favorite stores, items and comments
-            //.populate(favorite)
 
             // Deleta o password e a versão no retorno da atualização
             delete populateUser._doc.passwordHash;
@@ -145,25 +145,25 @@ router.patch(
     isAuth,
     attachCurrentUser,
     async (req, res) => {
-      try {
-        const loggedUser = req.currentUser;
-  
-        const activeUser = await userModel.findOneAndUpdate(
-          { _id: loggedUser._id },
-          { userIsActive: true },
-          { new: true, runValidators: true }
-        );
-  
-        // Deleta o password e a versão no retorno da atualização
-        delete activeUser._doc.passwordHash;
-        delete activeUser._doc.__v;
-  
-        return res.status(200).json(activeUser);
-      } catch (error) {
-        return res.status(500).json({ msg: error.message });
-      }
+        try {
+            const loggedUser = req.currentUser;
+
+            const activeUser = await userModel.findOneAndUpdate(
+                { _id: loggedUser._id },
+                { userIsActive: true },
+                { new: true, runValidators: true }
+            );
+
+            // Deleta o password e a versão no retorno da atualização
+            delete activeUser._doc.passwordHash;
+            delete activeUser._doc.__v;
+
+            return res.status(200).json(activeUser);
+        } catch (error) {
+            return res.status(500).json({ msg: error.message });
+        }
     }
-  );
+);
 
 
 module.exports = router

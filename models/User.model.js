@@ -9,7 +9,7 @@ const UserSchema = new Schema({
         type: String
     },
     favorite: [{
-        type: mongoose.Schema.Types.ObjectId, ref: "Oracles"
+        type: mongoose.Schema.Types.ObjectId, ref: "Oracle"
     }],
     passwordHash: {
         type: String /* required: true */
