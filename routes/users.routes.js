@@ -93,8 +93,10 @@ router.get("/profile", isAuth, attachCurrentUser, async (req, res) => {
         if (loggedUser) {
             const populateUser = await userModel
                 .findById(loggedUser._id)
-                .populate("favorite");
+                .populate("favorite")
             //populate user with favorite stores, items and comments
+
+            
 
             // Deleta o password e a versão no retorno da atualização
             delete populateUser._doc.passwordHash;
@@ -132,7 +134,7 @@ router.delete(
             delete disableUser._doc.passwordHash;
             delete disableUser._doc.__v;
 
-            return res.status(200).json(disableUser, "user disabled");
+            return res.status(200).json(disableUser);
         } catch (error) {
             return res.status(500).json({ msg: error.message });
         }

@@ -19,16 +19,23 @@ router.get("/list", async (req, res) => {
     }
 })
 
-//get one oracle by id
+//get one oracle by id public
 router.get("/:id", isAuth, attachCurrentUser, async (req, res) => {
     try {
 
         const { id } = req.params
 
-        const oracle = await oracleModel.findById(id).populate('cards')
+        const loggedUser = req.currentUser;
 
-        return res.status(200).json(oracle)
 
+        if (loggedUser) {
+            const oracle = await oracleModel.findById(id)
+                .populate("cards")
+                .populate("createBy")
+
+            console.log(oracle)
+            return res.status(200).json(oracle)
+        }
     } catch (error) {
         return res.status(500).json({ msg: error.message })
     }
@@ -39,11 +46,29 @@ router.get("/user/:id", isAuth, attachCurrentUser, async (req, res) => {
     try {
 
         const { id } = req.params
+        const loggedUser = req.currentUser
 
-        const oracles = await oracleModel.find({ createBy: id }).populate('cards')
-
+        const oracles = await oracleModel.findById(id).populate('cards')
+        console.log(oracles)
         return res.status(200).json(oracles)
 
+    } catch (error) {
+        return res.status(500).json({ msg: error.message })
+    }
+})
+
+//create a oracle
+router.post("/create", isAuth, attachCurrentUser, async (req, res) => {
+    try {
+        const oracle = await oracleModel.create({
+            ...req.body,
+            createBy: req.currentUser._id
+        })
+
+        await userModel.findByIdAndUpdate(req.currentUser._id, {
+            $push: { favorite: oracle._id }
+        })
+        return res.status(201).json(oracle)
     } catch (error) {
         return res.status(500).json({ msg: error.message })
     }
